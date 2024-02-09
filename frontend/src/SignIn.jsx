@@ -14,7 +14,6 @@ const SignIn = () => {
       const { data } = await apiClient.post("/signin", { email, password });
       e.target.reset();
       setFeedback(data.message);
-      sessionStorage.setItem("accessToken", data.data.accessToken);
       setCurrentUser(data.data);
     } catch (error) {
       console.log(error);

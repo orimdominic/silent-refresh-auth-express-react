@@ -3,6 +3,7 @@ const crypto = require("node:crypto");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const express = require("express");
 
 const { userDb } = require("./db");
@@ -10,7 +11,12 @@ const { userDb } = require("./db");
 dotenv.config();
 const app = express();
 
-app.use(express.json(), express.urlencoded({ extended: true }), cors());
+app.use(
+  express.json(),
+  express.urlencoded({ extended: true }),
+  cors(),
+  cookieParser("secret")
+);
 
 app.get("/", (_rq, rs) => rs.send("ok"));
 
@@ -60,15 +66,24 @@ app.post("/signin", async function (req, res) {
       throw new Error("invalid email/password combination");
     }
 
-    const accessToken = jwt.sign({ _id: user._id }, process.env.SALT, {
+    const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: 180, // 3 mins
     });
+
+    const refreshToken = jwt.sign(
+      { _id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: `1d`, // 3 mins
+      }
+    );
 
     return res.json({
       message: "sign in successful",
       data: {
         id: user._id,
         accessToken,
+        refreshToken,
       },
     });
   } catch (error) {
@@ -86,7 +101,7 @@ app.get("/protected", async function (req, res) {
     }
 
     accessToken = accessToken.replace("Bearer ", "");
-    jwt.verify(accessToken, process.env.SALT);
+    jwt.verify(accessToken, process.env.JWT_SECRET);
 
     return res.send("/protected accessed successfully");
   } catch (error) {

@@ -28,7 +28,7 @@ const Protected = () => {
       <h2>Protected</h2>
       <div>
         <p>{message}</p>
-        <button onClick={handleGetMessage}>Get data</button>
+        <button onClick={handleGetMessage}>Access protected</button>
       </div>
     </>
   );
