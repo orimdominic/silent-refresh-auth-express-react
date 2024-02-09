@@ -1,20 +1,24 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import apiClient from "./api-client";
+import { AuthContext } from "./AuthProvider";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [feedback, setFeedback] = useState("");
+  const { setCurrentUser } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      await apiClient.post("/signin", JSON.stringify(email, password));
+      const { data } = await apiClient.post("/signin", { email, password });
       e.target.reset();
-      setFeedback("success");
+      setFeedback(data.message);
+      sessionStorage.setItem("accessToken", data.data.accessToken);
+      setCurrentUser(data.data);
     } catch (error) {
-      console.error(error);
-      setFeedback("error");
+      console.log(error);
+      setFeedback(error.response.data ?? error.message);
     }
   };
 
@@ -34,7 +38,7 @@ const SignIn = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <br />
-        <button>Sign in</button>
+        <button>Sign in</button>{" "}
         <span color={feedback == "error" ? "red" : "green"}>{feedback}</span>
       </form>
     </>

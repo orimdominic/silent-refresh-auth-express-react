@@ -9,12 +9,12 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      const {data} = await apiClient.post("/signup", {email, password});
+      const { data } = await apiClient.post("/signup", { email, password });
       e.target.reset();
       setFeedback(data);
     } catch (error) {
-      console.log(error)
-      setFeedback(error.message ?? error.response.data);
+      console.log(error);
+      setFeedback(error.response.data ?? error.message);
     }
   };
 
@@ -34,8 +34,7 @@ const SignUp = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <br />
-        <button>Sign up</button>{" "}
-        <span>{feedback}</span>
+        <button>Sign up</button> <span>{feedback}</span>
       </form>
     </>
   );

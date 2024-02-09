@@ -57,11 +57,11 @@ app.post("/signin", async function (req, res) {
       .toString("hex");
 
     if (hash !== user.password) {
-      throw new Error("Invalid email/password combination");
+      throw new Error("invalid email/password combination");
     }
 
     const accessToken = jwt.sign({ _id: user._id }, process.env.SALT, {
-      expiresIn: 600, // 10 mins
+      expiresIn: 180, // 3 mins
     });
 
     return res.json({
@@ -97,6 +97,7 @@ app.get("/protected", async function (req, res) {
 app.post("/refresh-token", async function (req, res) {
   console.log(req.method, req.route.path);
   try {
+    return res.send("/refresh-token");
   } catch (error) {
     return res.status(500).send(error.message);
   }
